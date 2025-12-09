@@ -167,11 +167,11 @@ export default function PacManGame() {
     if (!ctx) return;
 
     // Clear canvas
-    ctx.fillStyle = '#000000';
+    ctx.fillStyle = '#F5F5F5';
     ctx.fillRect(0, 0, canvas.width, canvas.height);
 
     // Draw dots
-    ctx.fillStyle = '#FFB852';
+    ctx.fillStyle = '#FFA500';
     for (let y = 0; y < GRID_SIZE; y++) {
       for (let x = 0; x < GRID_SIZE; x++) {
         if (dotsRef.current[y]?.[x]) {
@@ -314,10 +314,10 @@ export default function PacManGame() {
   };
 
   return (
-    <div className="min-h-screen bg-black flex flex-col items-center justify-center p-4">
+    <div className="min-h-screen bg-white flex flex-col items-center justify-center p-4">
       <div className="text-center mb-6">
-        <h1 className="text-4xl font-bold text-yellow-400 mb-2">PAC-MAN</h1>
-        <p className="text-white text-xl">Score: {score}</p>
+        <h1 className="text-4xl font-bold text-blue-600 mb-2">PAC-MAN</h1>
+        <p className="text-gray-800 text-xl">Score: {score}</p>
       </div>
 
       <div className="relative">
@@ -325,14 +325,14 @@ export default function PacManGame() {
           ref={canvasRef}
           width={GRID_SIZE * CELL_SIZE}
           height={GRID_SIZE * CELL_SIZE}
-          className="border-4 border-blue-600 rounded-lg"
+          className="border-4 border-gray-300 rounded-lg shadow-lg"
         />
         
         {!gameStarted && (
-          <div className="absolute inset-0 flex items-center justify-center bg-black/80 rounded-lg">
+          <div className="absolute inset-0 flex items-center justify-center bg-white/90 rounded-lg">
             <button
               onClick={startGame}
-              className="px-8 py-4 bg-yellow-400 text-black font-bold text-xl rounded-lg hover:bg-yellow-300 transition-colors"
+              className="px-8 py-4 bg-blue-600 text-white font-bold text-xl rounded-lg hover:bg-blue-700 transition-colors shadow-lg"
             >
               START GAME
             </button>
@@ -340,12 +340,12 @@ export default function PacManGame() {
         )}
 
         {gameOver && (
-          <div className="absolute inset-0 flex flex-col items-center justify-center bg-black/90 rounded-lg">
-            <h2 className="text-3xl font-bold text-red-500 mb-4">GAME OVER!</h2>
-            <p className="text-white text-xl mb-6">Final Score: {score}</p>
+          <div className="absolute inset-0 flex flex-col items-center justify-center bg-white/95 rounded-lg">
+            <h2 className="text-3xl font-bold text-red-600 mb-4">GAME OVER!</h2>
+            <p className="text-gray-800 text-xl mb-6">Final Score: {score}</p>
             <button
               onClick={restartGame}
-              className="px-8 py-4 bg-yellow-400 text-black font-bold text-xl rounded-lg hover:bg-yellow-300 transition-colors"
+              className="px-8 py-4 bg-blue-600 text-white font-bold text-xl rounded-lg hover:bg-blue-700 transition-colors shadow-lg"
             >
               PLAY AGAIN
             </button>
@@ -353,11 +353,14 @@ export default function PacManGame() {
         )}
       </div>
 
-      <div className="mt-6 text-white text-center">
+      <div className="mt-6 text-gray-800 text-center">
         <p className="text-sm">Use arrow keys to move</p>
-        <p className="text-xs text-gray-400 mt-2">Eat all dots and avoid the ghosts!</p>
+        <p className="text-xs text-gray-500 mt-2">Eat all dots and avoid the ghosts!</p>
       </div>
     </div>
   );
 }
+
+
+
 
