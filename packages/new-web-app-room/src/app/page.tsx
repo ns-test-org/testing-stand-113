@@ -266,94 +266,173 @@ export default function PacManGame() {
 
   return (
     <div className="min-h-screen bg-black flex flex-col items-center justify-center p-4" style={{ fontFamily: "'Courier New', monospace" }}>
-      <div className="flex items-center justify-between w-full max-w-md mb-6">
-        <div className="text-center flex-1">
-          <h1 className="text-5xl font-bold text-[#00FF00] mb-2 tracking-widest" style={{ 
-            textShadow: '0 0 10px #00FF00',
-            fontFamily: "'Courier New', monospace"
-          }}>
-            ╔═══════════════╗
-          </h1>
-          <h1 className="text-4xl font-bold text-[#00FF00] mb-2 tracking-widest" style={{ 
-            textShadow: '0 0 10px #00FF00',
-            fontFamily: "'Courier New', monospace"
-          }}>
-            ║  PAC-MAN  ║
-          </h1>
-          <h1 className="text-5xl font-bold text-[#00FF00] mb-4 tracking-widest" style={{ 
-            textShadow: '0 0 10px #00FF00',
-            fontFamily: "'Courier New', monospace"
-          }}>
-            ╚═══════════════╝
-          </h1>
-          <p className="text-[#FFD700] text-2xl font-bold tracking-widest" style={{ fontFamily: "'Courier New', monospace" }}>
-            SCORE: {score.toString().padStart(4, '0')}
-          </p>
-        </div>
-      </div>
-
-      <div className="relative">
-        <canvas
-          ref={canvasRef}
-          width={GRID_SIZE * CELL_SIZE}
-          height={GRID_SIZE * CELL_SIZE}
-          className="border-4 border-[#00FF00]"
-          style={{ boxShadow: '0 0 20px #00FF00, inset 0 0 20px rgba(0,255,0,0.1)' }}
-        />
+      {/* CRT Screen Effect Container */}
+      <style jsx>{`
+        @keyframes flicker {
+          0% { opacity: 0.97; }
+          5% { opacity: 1; }
+          10% { opacity: 0.98; }
+          15% { opacity: 1; }
+          20% { opacity: 0.97; }
+          100% { opacity: 1; }
+        }
         
-        {!gameStarted && (
-          <div className="absolute inset-0 flex items-center justify-center bg-black/95">
-            <button
-              onClick={startGame}
-              className="px-8 py-4 bg-transparent border-4 border-[#00FF00] text-[#00FF00] font-bold text-2xl hover:bg-[#00FF00] hover:text-black transition-all"
-              style={{ 
-                textShadow: '0 0 10px #00FF00',
-                boxShadow: '0 0 20px #00FF00',
-                fontFamily: "'Courier New', monospace"
-              }}
-            >
-              [ START GAME ]
-            </button>
-          </div>
-        )}
+        .crt-screen {
+          position: relative;
+          border-radius: 8% / 5%;
+          background: radial-gradient(ellipse at center, #0a0a0a 0%, #000000 100%);
+          box-shadow: 
+            0 0 40px rgba(0, 255, 0, 0.3),
+            inset 0 0 100px rgba(0, 255, 0, 0.05);
+          animation: flicker 0.15s infinite;
+        }
+        
+        .crt-screen::before {
+          content: '';
+          position: absolute;
+          top: 0;
+          left: 0;
+          right: 0;
+          bottom: 0;
+          background: 
+            repeating-linear-gradient(
+              0deg,
+              rgba(0, 0, 0, 0.15),
+              rgba(0, 0, 0, 0.15) 1px,
+              transparent 1px,
+              transparent 2px
+            );
+          pointer-events: none;
+          z-index: 10;
+          border-radius: 8% / 5%;
+        }
+        
+        .crt-screen::after {
+          content: '';
+          position: absolute;
+          top: 0;
+          left: 0;
+          right: 0;
+          bottom: 0;
+          background: radial-gradient(ellipse at center, transparent 0%, rgba(0, 0, 0, 0.5) 100%);
+          pointer-events: none;
+          z-index: 11;
+          border-radius: 8% / 5%;
+        }
+        
+        .crt-content {
+          position: relative;
+          z-index: 5;
+          filter: blur(0.3px);
+        }
+        
+        .phosphor-glow {
+          text-shadow: 
+            0 0 5px #00FF00,
+            0 0 10px #00FF00,
+            0 0 20px #00FF00,
+            0 0 40px #00FF00;
+        }
+      `}</style>
 
-        {gameOver && (
-          <div className="absolute inset-0 flex flex-col items-center justify-center bg-black/95">
-            <h2 className="text-4xl font-bold text-[#FF0000] mb-4 tracking-widest" style={{ 
-              textShadow: '0 0 10px #FF0000',
-              fontFamily: "'Courier New', monospace"
-            }}>
-              *** GAME OVER ***
-            </h2>
-            <p className="text-[#FFD700] text-2xl font-bold mb-6 tracking-widest" style={{ fontFamily: "'Courier New', monospace" }}>
-              FINAL: {score.toString().padStart(4, '0')}
+      <div className="crt-screen p-8">
+        <div className="crt-content">
+          <div className="flex items-center justify-between w-full max-w-md mb-6">
+            <div className="text-center flex-1">
+              <h1 className="text-5xl font-bold text-[#00FF00] mb-2 tracking-widest phosphor-glow" style={{ 
+                fontFamily: "'Courier New', monospace"
+              }}>
+                ╔═══════════════╗
+              </h1>
+              <h1 className="text-4xl font-bold text-[#00FF00] mb-2 tracking-widest phosphor-glow" style={{ 
+                fontFamily: "'Courier New', monospace"
+              }}>
+                ║  PAC-MAN  ║
+              </h1>
+              <h1 className="text-5xl font-bold text-[#00FF00] mb-4 tracking-widest phosphor-glow" style={{ 
+                fontFamily: "'Courier New', monospace"
+              }}>
+                ╚═══════════════╝
+              </h1>
+              <p className="text-[#FFD700] text-2xl font-bold tracking-widest" style={{ 
+                fontFamily: "'Courier New', monospace",
+                textShadow: '0 0 10px #FFD700'
+              }}>
+                SCORE: {score.toString().padStart(4, '0')}
+              </p>
+            </div>
+          </div>
+
+          <div className="relative">
+            <canvas
+              ref={canvasRef}
+              width={GRID_SIZE * CELL_SIZE}
+              height={GRID_SIZE * CELL_SIZE}
+              className="border-4 border-[#00FF00]"
+              style={{ 
+                boxShadow: '0 0 20px #00FF00, inset 0 0 20px rgba(0,255,0,0.1)',
+                filter: 'contrast(1.1) brightness(1.1)'
+              }}
+            />
+        
+            {!gameStarted && (
+              <div className="absolute inset-0 flex items-center justify-center bg-black/95">
+                <button
+                  onClick={startGame}
+                  className="px-8 py-4 bg-transparent border-4 border-[#00FF00] text-[#00FF00] font-bold text-2xl hover:bg-[#00FF00] hover:text-black transition-all phosphor-glow"
+                  style={{ 
+                    boxShadow: '0 0 20px #00FF00',
+                    fontFamily: "'Courier New', monospace"
+                  }}
+                >
+                  [ START GAME ]
+                </button>
+              </div>
+            )}
+
+            {gameOver && (
+              <div className="absolute inset-0 flex flex-col items-center justify-center bg-black/95">
+                <h2 className="text-4xl font-bold text-[#FF0000] mb-4 tracking-widest" style={{ 
+                  textShadow: '0 0 10px #FF0000, 0 0 20px #FF0000',
+                  fontFamily: "'Courier New', monospace"
+                }}>
+                  *** GAME OVER ***
+                </h2>
+                <p className="text-[#FFD700] text-2xl font-bold mb-6 tracking-widest" style={{ 
+                  fontFamily: "'Courier New', monospace",
+                  textShadow: '0 0 10px #FFD700'
+                }}>
+                  FINAL: {score.toString().padStart(4, '0')}
+                </p>
+                <button
+                  onClick={restartGame}
+                  className="px-8 py-4 bg-transparent border-4 border-[#00FF00] text-[#00FF00] font-bold text-2xl hover:bg-[#00FF00] hover:text-black transition-all phosphor-glow"
+                  style={{ 
+                    boxShadow: '0 0 20px #00FF00',
+                    fontFamily: "'Courier New', monospace"
+                  }}
+                >
+                  [ PLAY AGAIN ]
+                </button>
+              </div>
+            )}
+          </div>
+
+          <div className="mt-8 text-[#00FF00] text-center font-bold" style={{ fontFamily: "'Courier New', monospace" }}>
+            <p className="text-lg tracking-widest phosphor-glow">
+              ↑ ↓ ← → ARROW KEYS
             </p>
-            <button
-              onClick={restartGame}
-              className="px-8 py-4 bg-transparent border-4 border-[#00FF00] text-[#00FF00] font-bold text-2xl hover:bg-[#00FF00] hover:text-black transition-all"
-              style={{ 
-                textShadow: '0 0 10px #00FF00',
-                boxShadow: '0 0 20px #00FF00',
-                fontFamily: "'Courier New', monospace"
-              }}
-            >
-              [ PLAY AGAIN ]
-            </button>
+            <p className="text-sm text-[#FFD700] mt-3 tracking-widest" style={{ textShadow: '0 0 5px #FFD700' }}>
+              EAT DOTS · AVOID GHOSTS
+            </p>
           </div>
-        )}
-      </div>
-
-      <div className="mt-8 text-[#00FF00] text-center font-bold" style={{ fontFamily: "'Courier New', monospace" }}>
-        <p className="text-lg tracking-widest" style={{ textShadow: '0 0 5px #00FF00' }}>
-          ↑ ↓ ← → ARROW KEYS
-        </p>
-        <p className="text-sm text-[#FFD700] mt-3 tracking-widest" style={{ textShadow: '0 0 5px #FFD700' }}>
-          EAT DOTS · AVOID GHOSTS
-        </p>
+        </div>
       </div>
     </div>
   );
 }
+
+
 
 
 
