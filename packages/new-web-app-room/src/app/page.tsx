@@ -169,140 +169,88 @@ export default function PacManGame() {
     const ctx = canvas.getContext('2d');
     if (!ctx) return;
 
-    // Clear canvas with 70s background colors
-    ctx.fillStyle = theme === 'dark' ? '#3E2723' : '#F4E4C1'; // Dark brown or cream
+    // Clear canvas with dark terminal background
+    ctx.fillStyle = '#0a0a0a';
     ctx.fillRect(0, 0, canvas.width, canvas.height);
 
-    // Draw dots in 70s orange
-    ctx.fillStyle = '#FF8C00'; // Dark orange - very 70s!
+    // ASCII-style grid background
+    ctx.strokeStyle = '#1a4d2e';
+    ctx.lineWidth = 1;
+    for (let i = 0; i < canvas.width; i += CELL_SIZE) {
+      ctx.beginPath();
+      ctx.moveTo(i, 0);
+      ctx.lineTo(i, canvas.height);
+      ctx.stroke();
+    }
+    for (let i = 0; i < canvas.height; i += CELL_SIZE) {
+      ctx.beginPath();
+      ctx.moveTo(0, i);
+      ctx.lineTo(canvas.width, i);
+      ctx.stroke();
+    }
+
+    // Draw dots as ASCII characters
+    ctx.fillStyle = '#FFD700';
+    ctx.font = 'bold 14px "Courier New", monospace';
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'middle';
     for (let y = 0; y < GRID_SIZE; y++) {
       for (let x = 0; x < GRID_SIZE; x++) {
         if (dotsRef.current[y]?.[x]) {
-          ctx.beginPath();
-          ctx.arc(
-            x * CELL_SIZE + CELL_SIZE / 2,
-            y * CELL_SIZE + CELL_SIZE / 2,
-            2,
-            0,
-            Math.PI * 2
-          );
-          ctx.fill();
+          ctx.fillText('·', x * CELL_SIZE + CELL_SIZE / 2, y * CELL_SIZE + CELL_SIZE / 2);
         }
       }
     }
 
-    // Draw Pac-Man in 70s gold/mustard yellow
+    // Draw Pac-Man as ASCII character
     const pacman = pacmanRef.current;
-    ctx.fillStyle = '#FFD700'; // Gold - groovy!
-    ctx.beginPath();
+    ctx.fillStyle = '#FFD700';
+    ctx.font = 'bold 20px "Courier New", monospace';
     
-    let startAngle = 0;
-    let endAngle = Math.PI * 2;
-    
+    let pacmanChar = 'O';
     if (mouthOpenRef.current) {
       switch (directionRef.current) {
         case 'RIGHT':
-          startAngle = 0.2 * Math.PI;
-          endAngle = 1.8 * Math.PI;
+          pacmanChar = '>';
           break;
         case 'LEFT':
-          startAngle = 1.2 * Math.PI;
-          endAngle = 0.8 * Math.PI;
+          pacmanChar = '<';
           break;
         case 'UP':
-          startAngle = 1.7 * Math.PI;
-          endAngle = 1.3 * Math.PI;
+          pacmanChar = '^';
           break;
         case 'DOWN':
-          startAngle = 0.7 * Math.PI;
-          endAngle = 0.3 * Math.PI;
+          pacmanChar = 'v';
           break;
       }
     }
     
-    ctx.arc(
-      pacman.x * CELL_SIZE + CELL_SIZE / 2,
-      pacman.y * CELL_SIZE + CELL_SIZE / 2,
-      CELL_SIZE / 2 - 2,
-      startAngle,
-      endAngle
-    );
-    ctx.lineTo(
+    ctx.fillText(
+      pacmanChar,
       pacman.x * CELL_SIZE + CELL_SIZE / 2,
       pacman.y * CELL_SIZE + CELL_SIZE / 2
     );
-    ctx.fill();
 
-    // Draw ghosts
+    // Draw ghosts as ASCII characters
     ghostsRef.current.forEach((ghost, index) => {
       ctx.fillStyle = GHOST_COLORS[index];
+      ctx.font = 'bold 18px "Courier New", monospace';
       
-      // Ghost body
-      ctx.beginPath();
-      ctx.arc(
+      // Ghost body as ASCII
+      ctx.fillText(
+        'M',
         ghost.x * CELL_SIZE + CELL_SIZE / 2,
-        ghost.y * CELL_SIZE + CELL_SIZE / 2,
-        CELL_SIZE / 2 - 2,
-        Math.PI,
-        0
+        ghost.y * CELL_SIZE + CELL_SIZE / 2
       );
-      ctx.lineTo(
-        ghost.x * CELL_SIZE + CELL_SIZE - 2,
-        ghost.y * CELL_SIZE + CELL_SIZE - 2
-      );
-      ctx.lineTo(
-        ghost.x * CELL_SIZE + CELL_SIZE - 5,
-        ghost.y * CELL_SIZE + CELL_SIZE / 2 + 3
-      );
-      ctx.lineTo(
-        ghost.x * CELL_SIZE + CELL_SIZE / 2,
-        ghost.y * CELL_SIZE + CELL_SIZE - 2
-      );
-      ctx.lineTo(
-        ghost.x * CELL_SIZE + 5,
-        ghost.y * CELL_SIZE + CELL_SIZE / 2 + 3
-      );
-      ctx.lineTo(ghost.x * CELL_SIZE + 2, ghost.y * CELL_SIZE + CELL_SIZE - 2);
-      ctx.closePath();
-      ctx.fill();
-
-      // Ghost eyes
+      
+      // Ghost eyes as dots
       ctx.fillStyle = '#FFFFFF';
-      ctx.beginPath();
-      ctx.arc(
-        ghost.x * CELL_SIZE + CELL_SIZE / 2 - 3,
-        ghost.y * CELL_SIZE + CELL_SIZE / 2 - 2,
-        2,
-        0,
-        Math.PI * 2
+      ctx.font = 'bold 8px "Courier New", monospace';
+      ctx.fillText(
+        '··',
+        ghost.x * CELL_SIZE + CELL_SIZE / 2,
+        ghost.y * CELL_SIZE + CELL_SIZE / 2 - 3
       );
-      ctx.arc(
-        ghost.x * CELL_SIZE + CELL_SIZE / 2 + 3,
-        ghost.y * CELL_SIZE + CELL_SIZE / 2 - 2,
-        2,
-        0,
-        Math.PI * 2
-      );
-      ctx.fill();
-
-      // Ghost pupils in 70s brown
-      ctx.fillStyle = '#654321'; // Dark brown
-      ctx.beginPath();
-      ctx.arc(
-        ghost.x * CELL_SIZE + CELL_SIZE / 2 - 3,
-        ghost.y * CELL_SIZE + CELL_SIZE / 2 - 2,
-        1,
-        0,
-        Math.PI * 2
-      );
-      ctx.arc(
-        ghost.x * CELL_SIZE + CELL_SIZE / 2 + 3,
-        ghost.y * CELL_SIZE + CELL_SIZE / 2 - 2,
-        1,
-        0,
-        Math.PI * 2
-      );
-      ctx.fill();
     });
   };
 
@@ -317,24 +265,31 @@ export default function PacManGame() {
   };
 
   return (
-    <div className="min-h-screen bg-[#F4E4C1] dark:bg-[#3E2723] flex flex-col items-center justify-center p-4" style={{ fontFamily: "'Cooper Black', 'Arial Black', sans-serif" }}>
+    <div className="min-h-screen bg-black flex flex-col items-center justify-center p-4" style={{ fontFamily: "'Courier New', monospace" }}>
       <div className="flex items-center justify-between w-full max-w-md mb-6">
         <div className="text-center flex-1">
-          <h1 className="text-5xl font-black text-[#FF8C00] dark:text-[#FFD700] mb-2 tracking-wider" style={{ 
-            textShadow: '3px 3px 0px #8B4513, 6px 6px 0px rgba(0,0,0,0.2)',
-            fontFamily: "'Cooper Black', 'Arial Black', sans-serif"
+          <h1 className="text-5xl font-bold text-[#00FF00] mb-2 tracking-widest" style={{ 
+            textShadow: '0 0 10px #00FF00',
+            fontFamily: "'Courier New', monospace"
           }}>
-            PAC-MAN
+            ╔═══════════════╗
           </h1>
-          <p className="text-[#8B4513] dark:text-[#DAA520] text-2xl font-bold tracking-wide">SCORE: {score}</p>
+          <h1 className="text-4xl font-bold text-[#00FF00] mb-2 tracking-widest" style={{ 
+            textShadow: '0 0 10px #00FF00',
+            fontFamily: "'Courier New', monospace"
+          }}>
+            ║  PAC-MAN  ║
+          </h1>
+          <h1 className="text-5xl font-bold text-[#00FF00] mb-4 tracking-widest" style={{ 
+            textShadow: '0 0 10px #00FF00',
+            fontFamily: "'Courier New', monospace"
+          }}>
+            ╚═══════════════╝
+          </h1>
+          <p className="text-[#FFD700] text-2xl font-bold tracking-widest" style={{ fontFamily: "'Courier New', monospace" }}>
+            SCORE: {score.toString().padStart(4, '0')}
+          </p>
         </div>
-        <button
-          onClick={toggleTheme}
-          className="ml-4 p-3 rounded-full bg-[#DAA520] dark:bg-[#8B4513] hover:bg-[#FF8C00] dark:hover:bg-[#D2691E] transition-colors shadow-lg"
-          aria-label="Toggle theme"
-        >
-          {theme === 'dark' ? '☀️' : '🌙'}
-        </button>
       </div>
 
       <div className="relative">
@@ -342,52 +297,65 @@ export default function PacManGame() {
           ref={canvasRef}
           width={GRID_SIZE * CELL_SIZE}
           height={GRID_SIZE * CELL_SIZE}
-          className="border-8 border-[#8B4513] dark:border-[#DAA520] rounded-lg shadow-2xl"
-          style={{ boxShadow: '0 8px 0 #654321, 0 12px 20px rgba(0,0,0,0.4)' }}
+          className="border-4 border-[#00FF00]"
+          style={{ boxShadow: '0 0 20px #00FF00, inset 0 0 20px rgba(0,255,0,0.1)' }}
         />
         
         {!gameStarted && (
-          <div className="absolute inset-0 flex items-center justify-center bg-[#F4E4C1]/95 dark:bg-[#3E2723]/95 rounded-lg">
+          <div className="absolute inset-0 flex items-center justify-center bg-black/95">
             <button
               onClick={startGame}
-              className="px-10 py-5 bg-[#FF8C00] text-[#3E2723] font-black text-2xl rounded-full hover:bg-[#FFD700] transition-all shadow-lg transform hover:scale-105"
+              className="px-8 py-4 bg-transparent border-4 border-[#00FF00] text-[#00FF00] font-bold text-2xl hover:bg-[#00FF00] hover:text-black transition-all"
               style={{ 
-                textShadow: '2px 2px 0px rgba(255,255,255,0.3)',
-                boxShadow: '0 6px 0 #8B4513, 0 8px 15px rgba(0,0,0,0.3)'
+                textShadow: '0 0 10px #00FF00',
+                boxShadow: '0 0 20px #00FF00',
+                fontFamily: "'Courier New', monospace"
               }}
             >
-              START GAME
+              [ START GAME ]
             </button>
           </div>
         )}
 
         {gameOver && (
-          <div className="absolute inset-0 flex flex-col items-center justify-center bg-[#F4E4C1]/95 dark:bg-[#3E2723]/95 rounded-lg">
-            <h2 className="text-4xl font-black text-[#D2691E] dark:text-[#FF8C00] mb-4 tracking-wider" style={{ textShadow: '3px 3px 0px #654321' }}>
-              GAME OVER!
+          <div className="absolute inset-0 flex flex-col items-center justify-center bg-black/95">
+            <h2 className="text-4xl font-bold text-[#FF0000] mb-4 tracking-widest" style={{ 
+              textShadow: '0 0 10px #FF0000',
+              fontFamily: "'Courier New', monospace"
+            }}>
+              *** GAME OVER ***
             </h2>
-            <p className="text-[#8B4513] dark:text-[#DAA520] text-2xl font-bold mb-6">FINAL SCORE: {score}</p>
+            <p className="text-[#FFD700] text-2xl font-bold mb-6 tracking-widest" style={{ fontFamily: "'Courier New', monospace" }}>
+              FINAL: {score.toString().padStart(4, '0')}
+            </p>
             <button
               onClick={restartGame}
-              className="px-10 py-5 bg-[#FF8C00] text-[#3E2723] font-black text-2xl rounded-full hover:bg-[#FFD700] transition-all shadow-lg transform hover:scale-105"
+              className="px-8 py-4 bg-transparent border-4 border-[#00FF00] text-[#00FF00] font-bold text-2xl hover:bg-[#00FF00] hover:text-black transition-all"
               style={{ 
-                textShadow: '2px 2px 0px rgba(255,255,255,0.3)',
-                boxShadow: '0 6px 0 #8B4513, 0 8px 15px rgba(0,0,0,0.3)'
+                textShadow: '0 0 10px #00FF00',
+                boxShadow: '0 0 20px #00FF00',
+                fontFamily: "'Courier New', monospace"
               }}
             >
-              PLAY AGAIN
+              [ PLAY AGAIN ]
             </button>
           </div>
         )}
       </div>
 
-      <div className="mt-8 text-[#8B4513] dark:text-[#DAA520] text-center font-bold">
-        <p className="text-lg tracking-wide">⬆️ ⬇️ ⬅️ ➡️ USE ARROW KEYS TO MOVE</p>
-        <p className="text-sm text-[#D2691E] dark:text-[#CD853F] mt-3 tracking-wider">🌼 EAT ALL DOTS • AVOID THE GHOSTS! 🌼</p>
+      <div className="mt-8 text-[#00FF00] text-center font-bold" style={{ fontFamily: "'Courier New', monospace" }}>
+        <p className="text-lg tracking-widest" style={{ textShadow: '0 0 5px #00FF00' }}>
+          ↑ ↓ ← → ARROW KEYS
+        </p>
+        <p className="text-sm text-[#FFD700] mt-3 tracking-widest" style={{ textShadow: '0 0 5px #FFD700' }}>
+          EAT DOTS · AVOID GHOSTS
+        </p>
       </div>
     </div>
   );
 }
+
+
 
 
 
