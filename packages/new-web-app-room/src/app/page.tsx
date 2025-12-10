@@ -10,7 +10,8 @@ const INITIAL_SPEED = 150;
 type Position = { x: number; y: number };
 type Direction = 'UP' | 'DOWN' | 'LEFT' | 'RIGHT';
 
-const GHOST_COLORS = ['#FF0000', '#FFB8FF', '#00FFFF', '#FFB852'];
+// 70s retro colors - groovy!
+const GHOST_COLORS = ['#D2691E', '#DAA520', '#8B4513', '#CD853F']; // Chocolate, Goldenrod, SaddleBrown, Peru
 
 export default function PacManGame() {
   const { theme, toggleTheme } = useTheme();
@@ -168,140 +169,88 @@ export default function PacManGame() {
     const ctx = canvas.getContext('2d');
     if (!ctx) return;
 
-    // Clear canvas
-    ctx.fillStyle = theme === 'dark' ? '#1F2937' : '#F5F5F5';
+    // Clear canvas with dark terminal background
+    ctx.fillStyle = '#0a0a0a';
     ctx.fillRect(0, 0, canvas.width, canvas.height);
 
-    // Draw dots
-    ctx.fillStyle = '#FFA500';
+    // ASCII-style grid background
+    ctx.strokeStyle = '#1a4d2e';
+    ctx.lineWidth = 1;
+    for (let i = 0; i < canvas.width; i += CELL_SIZE) {
+      ctx.beginPath();
+      ctx.moveTo(i, 0);
+      ctx.lineTo(i, canvas.height);
+      ctx.stroke();
+    }
+    for (let i = 0; i < canvas.height; i += CELL_SIZE) {
+      ctx.beginPath();
+      ctx.moveTo(0, i);
+      ctx.lineTo(canvas.width, i);
+      ctx.stroke();
+    }
+
+    // Draw dots as ASCII characters
+    ctx.fillStyle = '#FFD700';
+    ctx.font = 'bold 14px "Courier New", monospace';
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'middle';
     for (let y = 0; y < GRID_SIZE; y++) {
       for (let x = 0; x < GRID_SIZE; x++) {
         if (dotsRef.current[y]?.[x]) {
-          ctx.beginPath();
-          ctx.arc(
-            x * CELL_SIZE + CELL_SIZE / 2,
-            y * CELL_SIZE + CELL_SIZE / 2,
-            2,
-            0,
-            Math.PI * 2
-          );
-          ctx.fill();
+          ctx.fillText('·', x * CELL_SIZE + CELL_SIZE / 2, y * CELL_SIZE + CELL_SIZE / 2);
         }
       }
     }
 
-    // Draw Pac-Man
+    // Draw Pac-Man as ASCII character
     const pacman = pacmanRef.current;
-    ctx.fillStyle = '#FFFF00';
-    ctx.beginPath();
+    ctx.fillStyle = '#FFD700';
+    ctx.font = 'bold 20px "Courier New", monospace';
     
-    let startAngle = 0;
-    let endAngle = Math.PI * 2;
-    
+    let pacmanChar = 'O';
     if (mouthOpenRef.current) {
       switch (directionRef.current) {
         case 'RIGHT':
-          startAngle = 0.2 * Math.PI;
-          endAngle = 1.8 * Math.PI;
+          pacmanChar = '>';
           break;
         case 'LEFT':
-          startAngle = 1.2 * Math.PI;
-          endAngle = 0.8 * Math.PI;
+          pacmanChar = '<';
           break;
         case 'UP':
-          startAngle = 1.7 * Math.PI;
-          endAngle = 1.3 * Math.PI;
+          pacmanChar = '^';
           break;
         case 'DOWN':
-          startAngle = 0.7 * Math.PI;
-          endAngle = 0.3 * Math.PI;
+          pacmanChar = 'v';
           break;
       }
     }
     
-    ctx.arc(
-      pacman.x * CELL_SIZE + CELL_SIZE / 2,
-      pacman.y * CELL_SIZE + CELL_SIZE / 2,
-      CELL_SIZE / 2 - 2,
-      startAngle,
-      endAngle
-    );
-    ctx.lineTo(
+    ctx.fillText(
+      pacmanChar,
       pacman.x * CELL_SIZE + CELL_SIZE / 2,
       pacman.y * CELL_SIZE + CELL_SIZE / 2
     );
-    ctx.fill();
 
-    // Draw ghosts
+    // Draw ghosts as ASCII characters
     ghostsRef.current.forEach((ghost, index) => {
       ctx.fillStyle = GHOST_COLORS[index];
+      ctx.font = 'bold 18px "Courier New", monospace';
       
-      // Ghost body
-      ctx.beginPath();
-      ctx.arc(
+      // Ghost body as ASCII
+      ctx.fillText(
+        'M',
         ghost.x * CELL_SIZE + CELL_SIZE / 2,
-        ghost.y * CELL_SIZE + CELL_SIZE / 2,
-        CELL_SIZE / 2 - 2,
-        Math.PI,
-        0
+        ghost.y * CELL_SIZE + CELL_SIZE / 2
       );
-      ctx.lineTo(
-        ghost.x * CELL_SIZE + CELL_SIZE - 2,
-        ghost.y * CELL_SIZE + CELL_SIZE - 2
-      );
-      ctx.lineTo(
-        ghost.x * CELL_SIZE + CELL_SIZE - 5,
-        ghost.y * CELL_SIZE + CELL_SIZE / 2 + 3
-      );
-      ctx.lineTo(
-        ghost.x * CELL_SIZE + CELL_SIZE / 2,
-        ghost.y * CELL_SIZE + CELL_SIZE - 2
-      );
-      ctx.lineTo(
-        ghost.x * CELL_SIZE + 5,
-        ghost.y * CELL_SIZE + CELL_SIZE / 2 + 3
-      );
-      ctx.lineTo(ghost.x * CELL_SIZE + 2, ghost.y * CELL_SIZE + CELL_SIZE - 2);
-      ctx.closePath();
-      ctx.fill();
-
-      // Ghost eyes
+      
+      // Ghost eyes as dots
       ctx.fillStyle = '#FFFFFF';
-      ctx.beginPath();
-      ctx.arc(
-        ghost.x * CELL_SIZE + CELL_SIZE / 2 - 3,
-        ghost.y * CELL_SIZE + CELL_SIZE / 2 - 2,
-        2,
-        0,
-        Math.PI * 2
+      ctx.font = 'bold 8px "Courier New", monospace';
+      ctx.fillText(
+        '··',
+        ghost.x * CELL_SIZE + CELL_SIZE / 2,
+        ghost.y * CELL_SIZE + CELL_SIZE / 2 - 3
       );
-      ctx.arc(
-        ghost.x * CELL_SIZE + CELL_SIZE / 2 + 3,
-        ghost.y * CELL_SIZE + CELL_SIZE / 2 - 2,
-        2,
-        0,
-        Math.PI * 2
-      );
-      ctx.fill();
-
-      // Ghost pupils
-      ctx.fillStyle = '#0000FF';
-      ctx.beginPath();
-      ctx.arc(
-        ghost.x * CELL_SIZE + CELL_SIZE / 2 - 3,
-        ghost.y * CELL_SIZE + CELL_SIZE / 2 - 2,
-        1,
-        0,
-        Math.PI * 2
-      );
-      ctx.arc(
-        ghost.x * CELL_SIZE + CELL_SIZE / 2 + 3,
-        ghost.y * CELL_SIZE + CELL_SIZE / 2 - 2,
-        1,
-        0,
-        Math.PI * 2
-      );
-      ctx.fill();
     });
   };
 
@@ -316,61 +265,186 @@ export default function PacManGame() {
   };
 
   return (
-    <div className="min-h-screen bg-white dark:bg-gray-900 flex flex-col items-center justify-center p-4">
-      <div className="flex items-center justify-between w-full max-w-md mb-6">
-        <div className="text-center flex-1">
-          <h1 className="text-4xl font-bold text-blue-600 dark:text-blue-400 mb-2">PAC-MAN v6</h1>
-          <p className="text-gray-800 dark:text-gray-200 text-xl">Score: {score}</p>
-        </div>
-        <button
-          onClick={toggleTheme}
-          className="ml-4 p-3 rounded-lg bg-gray-200 dark:bg-gray-700 hover:bg-gray-300 dark:hover:bg-gray-600 transition-colors"
-          aria-label="Toggle theme"
-        >
-          {theme === 'dark' ? '☀️' : '🌙'}
-        </button>
-      </div>
-
-      <div className="relative">
-        <canvas
-          ref={canvasRef}
-          width={GRID_SIZE * CELL_SIZE}
-          height={GRID_SIZE * CELL_SIZE}
-          className="border-4 border-gray-300 dark:border-gray-600 rounded-lg shadow-lg"
-        />
+    <div className="min-h-screen bg-black flex flex-col items-center justify-center p-4" style={{ fontFamily: "'Courier New', monospace" }}>
+      {/* CRT Screen Effect Container */}
+      <style jsx>{`
+        @keyframes flicker {
+          0% { opacity: 0.97; }
+          5% { opacity: 1; }
+          10% { opacity: 0.98; }
+          15% { opacity: 1; }
+          20% { opacity: 0.97; }
+          100% { opacity: 1; }
+        }
         
-        {!gameStarted && (
-          <div className="absolute inset-0 flex items-center justify-center bg-white/90 dark:bg-gray-800/90 rounded-lg">
-            <button
-              onClick={startGame}
-              className="px-8 py-4 bg-blue-600 text-white font-bold text-xl rounded-lg hover:bg-blue-700 transition-colors shadow-lg"
-            >
-              START GAME
-            </button>
-          </div>
-        )}
+        .crt-screen {
+          position: relative;
+          border-radius: 8% / 5%;
+          background: radial-gradient(ellipse at center, #0a0a0a 0%, #000000 100%);
+          box-shadow: 
+            0 0 40px rgba(0, 255, 0, 0.3),
+            inset 0 0 100px rgba(0, 255, 0, 0.05);
+          animation: flicker 0.15s infinite;
+        }
+        
+        .crt-screen::before {
+          content: '';
+          position: absolute;
+          top: 0;
+          left: 0;
+          right: 0;
+          bottom: 0;
+          background: 
+            repeating-linear-gradient(
+              0deg,
+              rgba(0, 0, 0, 0.15),
+              rgba(0, 0, 0, 0.15) 1px,
+              transparent 1px,
+              transparent 2px
+            );
+          pointer-events: none;
+          z-index: 10;
+          border-radius: 8% / 5%;
+        }
+        
+        .crt-screen::after {
+          content: '';
+          position: absolute;
+          top: 0;
+          left: 0;
+          right: 0;
+          bottom: 0;
+          background: radial-gradient(ellipse at center, transparent 0%, rgba(0, 0, 0, 0.5) 100%);
+          pointer-events: none;
+          z-index: 11;
+          border-radius: 8% / 5%;
+        }
+        
+        .crt-content {
+          position: relative;
+          z-index: 5;
+          filter: blur(0.3px);
+        }
+        
+        .phosphor-glow {
+          text-shadow: 
+            0 0 5px #00FF00,
+            0 0 10px #00FF00,
+            0 0 20px #00FF00,
+            0 0 40px #00FF00;
+        }
+      `}</style>
 
-        {gameOver && (
-          <div className="absolute inset-0 flex flex-col items-center justify-center bg-white/95 dark:bg-gray-800/95 rounded-lg">
-            <h2 className="text-3xl font-bold text-red-600 dark:text-red-400 mb-4">GAME OVER!</h2>
-            <p className="text-gray-800 dark:text-gray-200 text-xl mb-6">Final Score: {score}</p>
-            <button
-              onClick={restartGame}
-              className="px-8 py-4 bg-blue-600 text-white font-bold text-xl rounded-lg hover:bg-blue-700 transition-colors shadow-lg"
-            >
-              PLAY AGAIN
-            </button>
+      <div className="crt-screen p-8">
+        <div className="crt-content">
+          <div className="flex items-center justify-between w-full max-w-md mb-6">
+            <div className="text-center flex-1">
+              <h1 className="text-5xl font-bold text-[#00FF00] mb-2 tracking-widest phosphor-glow" style={{ 
+                fontFamily: "'Courier New', monospace"
+              }}>
+                ╔═══════════════╗
+              </h1>
+              <h1 className="text-4xl font-bold text-[#00FF00] mb-2 tracking-widest phosphor-glow" style={{ 
+                fontFamily: "'Courier New', monospace"
+              }}>
+                ║  PAC-MAN  ║
+              </h1>
+              <h1 className="text-5xl font-bold text-[#00FF00] mb-4 tracking-widest phosphor-glow" style={{ 
+                fontFamily: "'Courier New', monospace"
+              }}>
+                ╚═══════════════╝
+              </h1>
+              <p className="text-[#FFD700] text-2xl font-bold tracking-widest" style={{ 
+                fontFamily: "'Courier New', monospace",
+                textShadow: '0 0 10px #FFD700'
+              }}>
+                SCORE: {score.toString().padStart(4, '0')}
+              </p>
+            </div>
           </div>
-        )}
-      </div>
 
-      <div className="mt-6 text-gray-800 dark:text-gray-200 text-center">
-        <p className="text-sm">Use arrow keys to move</p>
-        <p className="text-xs text-gray-500 dark:text-gray-400 mt-2">Eat all dots and avoid the ghosts!</p>
+          <div className="relative">
+            <canvas
+              ref={canvasRef}
+              width={GRID_SIZE * CELL_SIZE}
+              height={GRID_SIZE * CELL_SIZE}
+              className="border-4 border-[#00FF00]"
+              style={{ 
+                boxShadow: '0 0 20px #00FF00, inset 0 0 20px rgba(0,255,0,0.1)',
+                filter: 'contrast(1.1) brightness(1.1)'
+              }}
+            />
+        
+            {!gameStarted && (
+              <div className="absolute inset-0 flex items-center justify-center bg-black/95">
+                <button
+                  onClick={startGame}
+                  className="px-8 py-4 bg-transparent border-4 border-[#00FF00] text-[#00FF00] font-bold text-2xl hover:bg-[#00FF00] hover:text-black transition-all phosphor-glow"
+                  style={{ 
+                    boxShadow: '0 0 20px #00FF00',
+                    fontFamily: "'Courier New', monospace"
+                  }}
+                >
+                  [ START GAME ]
+                </button>
+              </div>
+            )}
+
+            {gameOver && (
+              <div className="absolute inset-0 flex flex-col items-center justify-center bg-black/95">
+                <h2 className="text-4xl font-bold text-[#FF0000] mb-4 tracking-widest" style={{ 
+                  textShadow: '0 0 10px #FF0000, 0 0 20px #FF0000',
+                  fontFamily: "'Courier New', monospace"
+                }}>
+                  *** GAME OVER ***
+                </h2>
+                <p className="text-[#FFD700] text-2xl font-bold mb-6 tracking-widest" style={{ 
+                  fontFamily: "'Courier New', monospace",
+                  textShadow: '0 0 10px #FFD700'
+                }}>
+                  FINAL: {score.toString().padStart(4, '0')}
+                </p>
+                <button
+                  onClick={restartGame}
+                  className="px-8 py-4 bg-transparent border-4 border-[#00FF00] text-[#00FF00] font-bold text-2xl hover:bg-[#00FF00] hover:text-black transition-all phosphor-glow"
+                  style={{ 
+                    boxShadow: '0 0 20px #00FF00',
+                    fontFamily: "'Courier New', monospace"
+                  }}
+                >
+                  [ PLAY AGAIN ]
+                </button>
+              </div>
+            )}
+          </div>
+
+          <div className="mt-8 text-[#00FF00] text-center font-bold" style={{ fontFamily: "'Courier New', monospace" }}>
+            <p className="text-lg tracking-widest phosphor-glow">
+              ↑ ↓ ← → ARROW KEYS
+            </p>
+            <p className="text-sm text-[#FFD700] mt-3 tracking-widest" style={{ textShadow: '0 0 5px #FFD700' }}>
+              EAT DOTS · AVOID GHOSTS
+            </p>
+          </div>
+        </div>
       </div>
     </div>
   );
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
