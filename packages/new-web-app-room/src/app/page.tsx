@@ -319,7 +319,7 @@ export default function PacManGame() {
     <div className="min-h-screen bg-white dark:bg-gray-900 flex flex-col items-center justify-center p-4">
       <div className="flex items-center justify-between w-full max-w-md mb-6">
         <div className="text-center flex-1">
-          <h1 className="text-4xl font-bold text-blue-600 dark:text-blue-400 mb-2">PAC-MAN v3</h1>
+          <h1 className="text-4xl font-bold text-blue-600 dark:text-blue-400 mb-2">PAC-MAN v5</h1>
           <p className="text-gray-800 dark:text-gray-200 text-xl">Score: {score}</p>
         </div>
         <button
@@ -371,6 +371,7 @@ export default function PacManGame() {
     </div>
   );
 }
+
 
 
 
