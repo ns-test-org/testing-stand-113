@@ -19,6 +19,11 @@
   }
 }
 
+.dark {
+  --background: #0a0a0a;
+  --foreground: #ededed;
+}
+
 /* Non-scroll and full-height baseline */
 html, body {
   height: 100%;
@@ -147,3 +152,4 @@ body {
 .animate-bounce-horizontal {
   animation: bounce-horizontal 1.5s ease-in-out infinite;
 }
+
