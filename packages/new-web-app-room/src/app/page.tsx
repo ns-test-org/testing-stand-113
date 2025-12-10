@@ -10,7 +10,8 @@ const INITIAL_SPEED = 150;
 type Position = { x: number; y: number };
 type Direction = 'UP' | 'DOWN' | 'LEFT' | 'RIGHT';
 
-const GHOST_COLORS = ['#FF0000', '#FFB8FF', '#00FFFF', '#FFB852'];
+// 70s retro colors - groovy!
+const GHOST_COLORS = ['#D2691E', '#DAA520', '#8B4513', '#CD853F']; // Chocolate, Goldenrod, SaddleBrown, Peru
 
 export default function PacManGame() {
   const { theme, toggleTheme } = useTheme();
@@ -168,12 +169,12 @@ export default function PacManGame() {
     const ctx = canvas.getContext('2d');
     if (!ctx) return;
 
-    // Clear canvas
-    ctx.fillStyle = theme === 'dark' ? '#1F2937' : '#F5F5F5';
+    // Clear canvas with 70s background colors
+    ctx.fillStyle = theme === 'dark' ? '#3E2723' : '#F4E4C1'; // Dark brown or cream
     ctx.fillRect(0, 0, canvas.width, canvas.height);
 
-    // Draw dots
-    ctx.fillStyle = '#FFA500';
+    // Draw dots in 70s orange
+    ctx.fillStyle = '#FF8C00'; // Dark orange - very 70s!
     for (let y = 0; y < GRID_SIZE; y++) {
       for (let x = 0; x < GRID_SIZE; x++) {
         if (dotsRef.current[y]?.[x]) {
@@ -190,9 +191,9 @@ export default function PacManGame() {
       }
     }
 
-    // Draw Pac-Man
+    // Draw Pac-Man in 70s gold/mustard yellow
     const pacman = pacmanRef.current;
-    ctx.fillStyle = '#FFFF00';
+    ctx.fillStyle = '#FFD700'; // Gold - groovy!
     ctx.beginPath();
     
     let startAngle = 0;
@@ -284,8 +285,8 @@ export default function PacManGame() {
       );
       ctx.fill();
 
-      // Ghost pupils
-      ctx.fillStyle = '#0000FF';
+      // Ghost pupils in 70s brown
+      ctx.fillStyle = '#654321'; // Dark brown
       ctx.beginPath();
       ctx.arc(
         ghost.x * CELL_SIZE + CELL_SIZE / 2 - 3,
@@ -316,15 +317,20 @@ export default function PacManGame() {
   };
 
   return (
-    <div className="min-h-screen bg-white dark:bg-gray-900 flex flex-col items-center justify-center p-4">
+    <div className="min-h-screen bg-[#F4E4C1] dark:bg-[#3E2723] flex flex-col items-center justify-center p-4" style={{ fontFamily: "'Cooper Black', 'Arial Black', sans-serif" }}>
       <div className="flex items-center justify-between w-full max-w-md mb-6">
         <div className="text-center flex-1">
-          <h1 className="text-4xl font-bold text-blue-600 dark:text-blue-400 mb-2">PAC-MAN v6</h1>
-          <p className="text-gray-800 dark:text-gray-200 text-xl">Score: {score}</p>
+          <h1 className="text-5xl font-black text-[#FF8C00] dark:text-[#FFD700] mb-2 tracking-wider" style={{ 
+            textShadow: '3px 3px 0px #8B4513, 6px 6px 0px rgba(0,0,0,0.2)',
+            fontFamily: "'Cooper Black', 'Arial Black', sans-serif"
+          }}>
+            PAC-MAN
+          </h1>
+          <p className="text-[#8B4513] dark:text-[#DAA520] text-2xl font-bold tracking-wide">SCORE: {score}</p>
         </div>
         <button
           onClick={toggleTheme}
-          className="ml-4 p-3 rounded-lg bg-gray-200 dark:bg-gray-700 hover:bg-gray-300 dark:hover:bg-gray-600 transition-colors"
+          className="ml-4 p-3 rounded-full bg-[#DAA520] dark:bg-[#8B4513] hover:bg-[#FF8C00] dark:hover:bg-[#D2691E] transition-colors shadow-lg"
           aria-label="Toggle theme"
         >
           {theme === 'dark' ? '☀️' : '🌙'}
@@ -336,14 +342,19 @@ export default function PacManGame() {
           ref={canvasRef}
           width={GRID_SIZE * CELL_SIZE}
           height={GRID_SIZE * CELL_SIZE}
-          className="border-4 border-gray-300 dark:border-gray-600 rounded-lg shadow-lg"
+          className="border-8 border-[#8B4513] dark:border-[#DAA520] rounded-lg shadow-2xl"
+          style={{ boxShadow: '0 8px 0 #654321, 0 12px 20px rgba(0,0,0,0.4)' }}
         />
         
         {!gameStarted && (
-          <div className="absolute inset-0 flex items-center justify-center bg-white/90 dark:bg-gray-800/90 rounded-lg">
+          <div className="absolute inset-0 flex items-center justify-center bg-[#F4E4C1]/95 dark:bg-[#3E2723]/95 rounded-lg">
             <button
               onClick={startGame}
-              className="px-8 py-4 bg-blue-600 text-white font-bold text-xl rounded-lg hover:bg-blue-700 transition-colors shadow-lg"
+              className="px-10 py-5 bg-[#FF8C00] text-[#3E2723] font-black text-2xl rounded-full hover:bg-[#FFD700] transition-all shadow-lg transform hover:scale-105"
+              style={{ 
+                textShadow: '2px 2px 0px rgba(255,255,255,0.3)',
+                boxShadow: '0 6px 0 #8B4513, 0 8px 15px rgba(0,0,0,0.3)'
+              }}
             >
               START GAME
             </button>
@@ -351,12 +362,18 @@ export default function PacManGame() {
         )}
 
         {gameOver && (
-          <div className="absolute inset-0 flex flex-col items-center justify-center bg-white/95 dark:bg-gray-800/95 rounded-lg">
-            <h2 className="text-3xl font-bold text-red-600 dark:text-red-400 mb-4">GAME OVER!</h2>
-            <p className="text-gray-800 dark:text-gray-200 text-xl mb-6">Final Score: {score}</p>
+          <div className="absolute inset-0 flex flex-col items-center justify-center bg-[#F4E4C1]/95 dark:bg-[#3E2723]/95 rounded-lg">
+            <h2 className="text-4xl font-black text-[#D2691E] dark:text-[#FF8C00] mb-4 tracking-wider" style={{ textShadow: '3px 3px 0px #654321' }}>
+              GAME OVER!
+            </h2>
+            <p className="text-[#8B4513] dark:text-[#DAA520] text-2xl font-bold mb-6">FINAL SCORE: {score}</p>
             <button
               onClick={restartGame}
-              className="px-8 py-4 bg-blue-600 text-white font-bold text-xl rounded-lg hover:bg-blue-700 transition-colors shadow-lg"
+              className="px-10 py-5 bg-[#FF8C00] text-[#3E2723] font-black text-2xl rounded-full hover:bg-[#FFD700] transition-all shadow-lg transform hover:scale-105"
+              style={{ 
+                textShadow: '2px 2px 0px rgba(255,255,255,0.3)',
+                boxShadow: '0 6px 0 #8B4513, 0 8px 15px rgba(0,0,0,0.3)'
+              }}
             >
               PLAY AGAIN
             </button>
@@ -364,13 +381,23 @@ export default function PacManGame() {
         )}
       </div>
 
-      <div className="mt-6 text-gray-800 dark:text-gray-200 text-center">
-        <p className="text-sm">Use arrow keys to move</p>
-        <p className="text-xs text-gray-500 dark:text-gray-400 mt-2">Eat all dots and avoid the ghosts!</p>
+      <div className="mt-8 text-[#8B4513] dark:text-[#DAA520] text-center font-bold">
+        <p className="text-lg tracking-wide">⬆️ ⬇️ ⬅️ ➡️ USE ARROW KEYS TO MOVE</p>
+        <p className="text-sm text-[#D2691E] dark:text-[#CD853F] mt-3 tracking-wider">🌼 EAT ALL DOTS • AVOID THE GHOSTS! 🌼</p>
       </div>
     </div>
   );
 }
+
+
+
+
+
+
+
+
+
+
 
 
 
