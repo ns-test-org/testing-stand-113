@@ -316,7 +316,7 @@ export default function PacManGame() {
   return (
     <div className="min-h-screen bg-white flex flex-col items-center justify-center p-4">
       <div className="text-center mb-6">
-        <h1 className="text-4xl font-bold text-blue-600 mb-2">PAC-MAN</h1>
+        <h1 className="text-4xl font-bold text-blue-600 mb-2">PAC-MAN v2</h1>
         <p className="text-gray-800 text-xl">Score: {score}</p>
       </div>
 
@@ -360,6 +360,7 @@ export default function PacManGame() {
     </div>
   );
 }
+
 
 
 
