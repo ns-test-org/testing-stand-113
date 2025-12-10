@@ -13,7 +13,7 @@ type Direction = 'UP' | 'DOWN' | 'LEFT' | 'RIGHT';
 const GHOST_COLORS = ['#FF0000', '#FFB8FF', '#00FFFF', '#FFB852'];
 
 export default function PacManGame() {
-  const { theme, toggleTheme } = useTheme();
+  const { theme, toggleTheme, mounted } = useTheme();
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const [score, setScore] = useState(0);
   const [gameOver, setGameOver] = useState(false);
@@ -322,13 +322,15 @@ export default function PacManGame() {
           <h1 className="text-4xl font-bold text-blue-600 dark:text-blue-400 mb-2">PAC-MAN v3</h1>
           <p className="text-gray-800 dark:text-gray-200 text-xl">Score: {score}</p>
         </div>
-        <button
-          onClick={toggleTheme}
-          className="ml-4 p-3 rounded-lg bg-gray-200 dark:bg-gray-700 hover:bg-gray-300 dark:hover:bg-gray-600 transition-colors"
-          aria-label="Toggle dark mode"
-        >
-          {theme === 'light' ? '🌙' : '☀️'}
-        </button>
+        {mounted && (
+          <button
+            onClick={toggleTheme}
+            className="ml-4 p-3 rounded-lg bg-gray-200 dark:bg-gray-700 hover:bg-gray-300 dark:hover:bg-gray-600 transition-colors"
+            aria-label="Toggle dark mode"
+          >
+            {theme === 'light' ? '🌙' : '☀️'}
+          </button>
+        )}
       </div>
 
       <div className="relative">
@@ -371,6 +373,8 @@ export default function PacManGame() {
     </div>
   );
 }
+
+
 
 
 
